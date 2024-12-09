@@ -1,0 +1,48 @@
+use std::error::Error;
+
+fn parse_into_arrays(input: &str) -> Result<(Vec<i32>, Vec<i32>), Box<dyn Error>> {
+    let mut left_values = Vec::new();
+    let mut right_values = Vec::new();
+
+    for line in input.lines() {
+        let line = line.trim();
+        if line.is_empty() {
+            continue;
+        }
+
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() != 2 {
+            return Err("Invalid input format: Each line should contain exactly two integers.".into());
+        }
+
+        let left_num: i32 = parts[0].parse()?;
+        let right_num: i32 = parts[1].parse()?;
+
+        left_values.push(left_num);
+        right_values.push(right_num);
+    }
+
+    Ok((left_values, right_values))
+}
+
+fn calculate_total_distance(left: &[i32], right: &[i32]) -> i32 {
+    let mut left_sorted = left.to_vec();
+    let mut right_sorted = right.to_vec();
+
+    left_sorted.sort();
+    right_sorted.sort();
+
+    left_sorted.iter().zip(right_sorted.iter())
+        .map(|(l, r)| (l - r).abs())
+        .sum()
+}
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let input = "";
+    let (left, right) = parse_into_arrays(input)?;
+    let total_distance = calculate_total_distance(&left, &right);
+
+    println!("Total distance: {}", total_distance);
+
+    Ok(())
+}
