@@ -13,7 +13,6 @@ fn is_safe_report(levels: &[i32]) -> bool {
     }
 
     let increasing = first_diff > 0;
-
     for window in levels.windows(2) {
         let diff = window[1] - window[0];
         if diff == 0 {
@@ -36,10 +35,28 @@ fn is_safe_report(levels: &[i32]) -> bool {
     true
 }
 
+/// Checks if a report is safe as-is, or can be made safe by removing exactly one level.
+/// Returns true if the report is safe without removal or if removing one level makes it safe.
+fn is_safe_with_removal(levels: &[i32]) -> bool {
+    // Check if already safe
+    if is_safe_report(levels) {
+        return true;
+    }
+
+    // Try removing each level once and check if safe
+    for i in 0..levels.len() {
+        let mut modified = levels.to_vec();
+        modified.remove(i);
+        if is_safe_report(&modified) {
+            return true;
+        }
+    }
+
+    false
+}
+
 fn main() -> Result<(), Box<dyn Error>> {
-    // Example input as a single string
     let input = "\
-    
 ";
 
     let start = Instant::now();
@@ -56,13 +73,13 @@ fn main() -> Result<(), Box<dyn Error>> {
             .filter_map(|s| s.parse::<i32>().ok())
             .collect();
 
-        if is_safe_report(&levels) {
+        if is_safe_with_removal(&levels) {
             safe_count += 1;
         }
     }
 
     let duration = start.elapsed();
-    println!("Number of safe reports: {}", safe_count);
+    println!("Number of reports now safe (considering removal): {}", safe_count);
     println!("Time taken: {:?}", duration);
 
     Ok(())
